@@ -38,6 +38,30 @@ Useful functions:
   Matlab has a build in kmeans function, see 'help kmeans', but it is
   slower.
 %}
+% Find out how many images we are processing
+total_image = size(image_paths, 1);
+
+% Number of visual Words
+k = vocab_size;
+
+% initialize empty matrix to store SIFT features
+sift_features = [];
+
+for image_count = 1:total_image
+    % Read the image and turn it into grayscale
+    image_grayscale = rgb2gray(imread(cell2mat(image_paths(image_count))));
+
+    I = single(image_grayscale);
+    % Extract the SIFT Features (F) and Descriptors (D)
+    [~, descriptors] = vl_dsift(I, 'step', 10, 'Fast');
+
+    % concatenate descriptors to sift_features matrix
+    sift_features = [sift_features, descriptors];
+end
+% Cluster the the descriptors to k clusters
+[centers, ~] = vl_kmeans(single(sift_features), k);
+
+vocab = centers';
 
 % Load images from the training set. To save computation time, you don't
 % necessarily need to sample from all images, although it would be better
