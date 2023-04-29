@@ -2,7 +2,7 @@
 % University 
 % Michal Mackiewicz, UEA
 
-function image_feats = get_bags_of_sifts(image_paths)
+function [image_feats] = get_bags_of_sifts(image_paths)
 % image_paths is an N x 1 cell array of strings where each string is an
 % image path on the file system.
 
@@ -50,3 +50,26 @@ D = vl_alldist2(X,Y)
 %}
 
 load('vocab.mat')
+
+% Find out how many images we are processing
+total_image = size(image_paths, 1);
+% Get the size of the vocab i.e No of clusters
+vocab_size = size(vocab, 1);
+% Create a matrix to store the counts of each vocab in an image (histogram)
+image_feats = zeros(total_image, vocab_size);
+% Loop theough every image in the file
+for image_count = 1:total_image
+    % Read the image and turn it into grayscale
+    image = rgb2gray(imread(cell2mat(image_paths(image_count))));
+    % Make the image of type single to work with the function vl_dsift()
+    image = single(image);
+    % Extract the SIFT Features and Descriptors
+    [~, descriptors] = vl_dsift(image, 'step', 10, 'Fast');
+    % Convert the descriptors to single data type
+    descriptors = single(descriptors);
+    % Find the nearrest vocab to each descriptor found
+    [indices, ~] = knnsearch(vocab, descriptors', "K", 1);
+    
+    
+    image_feats(image_count, :) = histcounts(indices, vocab_size);
+end
