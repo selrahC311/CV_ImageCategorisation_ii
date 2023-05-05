@@ -1,9 +1,9 @@
 %% Step 0: Set up parameters, vlfeat, category list, and image paths.
 
-FEATURE = 'bag of sift grayscale';
-% FEATURE = 'bag of sift colour';
-step = 8;
-size = 16;
+% FEATURE = 'bag of sift grayscale';
+FEATURE = 'bag of sift colour';
+step = 3;
+size = 8;
 
 % FEATURE = 'spatial pyramids sift grayscale'
 % FEATURE = 'spatial pyramids sift colour'
@@ -52,27 +52,48 @@ switch lower(FEATURE)
     
     case 'bag of sift colour'
         % YOU CODE build_vocabulary.m
-        if ~exist('vocab.mat', 'file')
+        % if ~exist('vocab.mat', 'file')
             fprintf('No existing dictionary found. Computing one from training images\n')
             vocab_size = 50; % you need to test the influence of this parameter
             vocab = build_vocabulary(train_image_paths, vocab_size); %Also allow for different sift parameters
             save('vocab.mat', 'vocab')
-        end 
+        % end 
         % YOU CODE get_bags_of_sifts.m
-        if ~exist('image_feats.mat', 'file')
-            train_image_feats = get_bag_of_sifts_colour(train_image_paths); %Allow for different sift parameters
-            test_image_feats  = get_bag_of_sifts_colour(test_image_paths); 
+        % if ~exist('image_feats.mat', 'file')
+            train_image_feats = get_bag_of_sifts_colour(train_image_paths, step, size); %Allow for different sift parameters
+            test_image_feats  = get_bag_of_sifts_colour(test_image_paths, step, size); 
             save('image_feats.mat', 'train_image_feats', 'test_image_feats')
-        end
+        % end
     
     case 'spatial pyramids grayscale'
-        % TODO spatial pyramids method
+        % YOU CODE build_vocabulary.m
+        % if ~exist('vocab.mat', 'file')
+            fprintf('No existing dictionary found. Computing one from training images\n')
+            vocab_size = 50; % you need to test the influence of this parameter
+            vocab = build_vocabulary(train_image_paths, vocab_size); %Also allow for different sift parameters
+            save('vocab.mat', 'vocab')
+        % end 
+        % YOU CODE get_bags_of_sifts.m
+        % if ~exist('image_feats.mat', 'file')
+            train_image_feats = get_spatial_pyramid_grayscale(train_image_paths, step, size); %Allow for different sift parameters
+            test_image_feats  = get_spatial_pyramid_grayscale(test_image_paths, step, size); 
+            save('image_feats.mat', 'train_image_feats', 'test_image_feats')
+        % end
 
     case 'spatial pyramids colour'
-        % TODO spatial pyramids method
-        train_image_feats = get_spatial_pyramid_kernel(train_image_paths);
-        test_image_feats = get_spatial_pyramid_kernel(test_image_paths);
-
+       % YOU CODE build_vocabulary.m
+        % if ~exist('vocab.mat', 'file')
+            fprintf('No existing dictionary found. Computing one from training images\n')
+            vocab_size = 50; % you need to test the influence of this parameter
+            vocab = build_vocabulary(train_image_paths, vocab_size); %Also allow for different sift parameters
+            save('vocab.mat', 'vocab')
+        % end 
+        % YOU CODE get_bags_of_sifts.m
+        % if ~exist('image_feats.mat', 'file')
+            train_image_feats = get_spatial_pyramid_colour(train_image_paths, step, size); %Allow for different sift parameters
+            test_image_feats  = get_spatial_pyramid_colour(test_image_paths, step, size); 
+            save('image_feats.mat', 'train_image_feats', 'test_image_feats')
+        % end
 end
 %% Step 2: Classify each test image by training and using the appropriate classifier
 fprintf('Using %s classifier to predict test set categories\n', CLASSIFIER)
