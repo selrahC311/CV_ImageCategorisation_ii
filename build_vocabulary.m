@@ -1,44 +1,14 @@
+% Based on James Hays, Brown University 
+
+%This function will sample SIFT descriptors from the training images,
+%cluster them with kmeans, and then return the cluster centers.
+
 function vocab = build_vocabulary( image_paths, vocab_size )
-% Find out how many images we are processing
-total_image = size(image_paths, 1);
+% The inputs are images, a N x 1 cell array of image paths and the size of 
+% the vocabulary.
 
-% Number of visual Words
-k = vocab_size;
-
-% initialize empty matrix to store SIFT features
-sift_features = [];
-
-for image_count = 1:total_image
-    % Read the image and turn it into grayscale
-    image_grayscale = rgb2gray(imread(cell2mat(image_paths(image_count))));
-
-    I = single(image_grayscale);
-    % Extract the SIFT Features (F) and Descriptors (D)
-    [~, descriptors] = vl_dsift(I, 'step', 10, 'Fast');
-
-    % concatenate descriptors to sift_features matrix
-    sift_features = [sift_features, descriptors];
-end
-% Cluster the the descriptors to k clusters
-[centers, ~] = vl_kmeans(single(sift_features), k);
-
-vocab = centers';
-
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-
-% Load images from the training set. To save computation time, you don't
-% necessarily need to sample from all images, although it would be better
-% to do so. You can randomly sample the descriptors from each image to save
-% memory and speed up the clustering. Or you can simply call vl_dsift with
-% a large step size here, but a smaller step size in make_hist.m. 
-
-% For each loaded image, get some SIFT features. You don't have to get as
-% many SIFT features as you will in get_bags_of_sift.m, because you're only
-% trying to get a representative sample here.
-
-% Once you have tens of thousands of SIFT features from many training
-% images, cluster them with kmeans. The resulting centroids are now your
-% visual word vocabulary.
+% The output 'vocab' should be vocab_size x 128. Each row is a cluster
+% centroid / visual word.
 
 %{ 
 Useful functions:
@@ -68,4 +38,53 @@ Useful functions:
   Matlab has a build in kmeans function, see 'help kmeans', but it is
   slower.
 %}
+% Find out how many images we are processing
+total_image = size(image_paths, 1);
 
+% Number of visual Words
+k_visual_words = vocab_size;
+
+% initialize empty matrix to store SIFT features
+sift_features = [];
+
+% parameters for the sift function
+step = 10;
+size_ = 8;
+
+% Loop through every image in the dataset
+for image_count = 1:total_image
+
+    % Read the image and turn it into grayscale
+    image_grayscale = rgb2gray(imread(cell2mat(image_paths(image_count))));
+
+    % Make the image of type single to work with the function vl_dsift()
+    I = single(image_grayscale);
+
+    % Extract the SIFT Features (F) and Descriptors (D)
+    [~, descriptors] = vl_dsift(I,'Fast', 'step', step, 'size', size_);
+
+    % concatenate descriptors to sift_features matrix
+    sift_features = [sift_features, descriptors];
+
+    % Print the progress...so far...
+    fprintf('Progress: %d%%\n', round((image_count/total_image)*100));
+end
+fprintf('clustering the centers')
+% Cluster the the descriptors to k clusters
+[centers, ~] = vl_kmeans(double(sift_features), k_visual_words);
+fprintf('done cliustering the centres')
+vocab = centers';
+
+% Load images from the training set. To save computation time, you don't
+% necessarily need to sample from all images, although it would be better
+% to do so. You can randomly sample the descriptors from each image to save
+% memory and speed up the clustering. Or you can simply call vl_dsift with
+% a large step size here, but a smaller step size in make_hist.m. 
+
+% For each loaded image, get some SIFT features. You don't have to get as
+% many SIFT features as you will in get_bags_of_sift.m, because you're only
+% trying to get a representative sample here.
+
+% Once you have tens of thousands of SIFT features from many training
+% images, cluster them with kmeans. The resulting centroids are now your
+% visual word vocabulary.
