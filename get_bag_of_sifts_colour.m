@@ -1,12 +1,12 @@
-function [image_feats] = get_bag_of_sifts_colour(image_paths, step, size)
+function [image_feats] = get_bag_of_sifts_colour(image_paths, step, size_)
 
 load('vocab.mat')
 
 % Find out how many images we are processing
-total_image = length(image_paths);
+total_image = size(image_paths, 1);
 
 % Get the size of the vocab i.e No of clusters
-vocab_size = length(vocab);
+vocab_size = size(vocab, 1);
 
 % Create a matrix to store the counts of each vocab in an image (histogram)
 image_feats = zeros(total_image, vocab_size);
@@ -25,7 +25,7 @@ for image_count = 1:total_image
         colour_channel = image(:, :, channel);
         
         % Extract the SIFT Features and Descriptors
-        [~, descriptors] = vl_dsift(colour_channel, 'step', step, 'size', size, 'Fast');
+        [~, descriptors] = vl_dsift(colour_channel, 'step', step, 'size', size_, 'Fast');
         
         % Convert the descriptors to single data type
         descriptors = single(descriptors);
