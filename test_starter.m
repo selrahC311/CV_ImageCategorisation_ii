@@ -48,6 +48,7 @@ switch lower(FEATURE)
             load('training_bag.mat');
         end
         
+<<<<<<< HEAD
         if ~exist('test_bag.mat', 'file')
             fprintf('Computing test features\n');
             test_image_feats  = get_bags_of_sifts(test_image_paths);
@@ -68,6 +69,23 @@ switch lower(FEATURE)
         [train_image_feats, res] = spatial_pyramid(train_image_paths, 4); %Allow for different sift parameters
         [test_image_feats, res2]  = spatial_pyramid(test_image_paths, 4);
 %         save('image_feats.mat', 'train_image_feats', 'test_image_feats')
+=======
+        %% Step 3: Build a confusion matrix and score the recognition system
+        % You do not need to code anything in this section. 
+        
+        % This function will recreate results_webpage/index.html and various image
+        % thumbnails each time it is called. View the webpage to help interpret
+        % your classifier performance. Where is it making mistakes? Are the
+        % confusions reasonable?
+        create_results_webpage_modified( train_image_paths, ...
+                                test_image_paths, ...
+                                train_labels, ...
+                                test_labels, ...
+                                categories, ...
+                                abbr_categories, ...
+                                predicted_categories)
+    end
+>>>>>>> main
 end
 
 

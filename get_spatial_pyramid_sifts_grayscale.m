@@ -21,7 +21,7 @@ for image_count_i = 1:total_image
     image = single(image);
     
     % Extract the SIFT Features and Descriptors
-    [~, descriptors] = vl_dsift(image, 'step', 10, 'Fast');
+    [~, descriptors] = vl_dsift(image, 'step', 3, 'size', 8, 'Fast');
     
     % Convert the descriptors to single data type
     descriptors = single(descriptors);
