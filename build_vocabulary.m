@@ -1,4 +1,4 @@
-function vocab = build_vocabulary( image_paths, vocab_size )
+function vocab = build_vocabulary( image_paths, vocab_size, step, size)
 % Find out how many images we are processing
 total_image = size(image_paths, 1);
 
@@ -14,7 +14,7 @@ for image_count = 1:total_image
 
     I = single(image_grayscale);
     % Extract the SIFT Features (F) and Descriptors (D)
-    [~, descriptors] = vl_dsift(I, 'step', 10, 'Fast');
+    [~, descriptors] = vl_dsift(I, 'step', step, 'size', size, 'Fast');
 
     % concatenate descriptors to sift_features matrix
     sift_features = [sift_features, descriptors];

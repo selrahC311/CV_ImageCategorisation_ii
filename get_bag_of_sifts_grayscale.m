@@ -2,10 +2,10 @@ function [image_feats] = get_bag_of_sifts_grayscale(image_paths, step, size)
 load('vocab.mat')
 
 % Find out how many images we are processing
-total_image = size(image_paths, 1);
+total_image = length(image_paths);
 
 % Get the size of the vocab i.e No of clusters
-vocab_size = size(vocab, 1);
+vocab_size = length(vocab);
 
 % Create a matrix to store the counts of each vocab in an image (histogram)
 image_feats = zeros(total_image, vocab_size);
@@ -19,7 +19,7 @@ for image_count = 1:total_image
     image = single(image);
     
     % Extract the SIFT Features and Descriptors
-    [~, descriptors] = vl_dsift(image, 'step', step, 'Size', size, 'Fast');
+    [~, descriptors] = vl_dsift(image, 'step', step, 'size', size, 'Fast');
     
     % Convert the descriptors to single data type
     descriptors = single(descriptors);
@@ -28,6 +28,8 @@ for image_count = 1:total_image
     [indices, ~] = knnsearch(vocab, descriptors', "K", 1);
         
     image_feats(image_count, :) = histcounts(indices, vocab_size);
+
+    fprintf('Progress: %d%%\n', round((image_count/total_image)*100));
 end
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
