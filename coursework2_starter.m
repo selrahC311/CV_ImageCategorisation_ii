@@ -89,7 +89,7 @@ switch lower(FEATURE)
         % YOU CODE get_bags_of_sifts.m
         if ~exist('training_bag.mat', 'file')
             fprintf('Computing training features\n');
-            train_image_feats = get_bags_of_sifts(train_image_paths);
+            train_image_feats = get_bags_of_sifts_grayscale(train_image_paths);
             save('training_bag.mat', 'train_image_feats');
         else
             fprintf('Loading training features\n');
@@ -98,7 +98,7 @@ switch lower(FEATURE)
         
         if ~exist('test_bag.mat', 'file')
             fprintf('Computing test features\n');
-            test_image_feats  = get_bags_of_sifts(test_image_paths);
+            test_image_feats  = get_bags_of_sifts_grayscale(test_image_paths);
             save('test_bag.mat', 'test_image_feats')
         else
             fprintf('Loading test features\n');
