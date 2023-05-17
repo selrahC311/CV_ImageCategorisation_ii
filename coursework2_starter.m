@@ -1,18 +1,19 @@
 %% Step 0: Set up parameters, vlfeat, category list, and image paths.
 
-step = 3;
-size = 8;
+step = 4;
+size_ = 7;
 
-vocab_size = 1000; % you need to test the influence of this parameter
+vocab_size = 100; % you need to test the influence of this parameter
 
 FEATURE = 'bag of sift grayscale';
 % FEATURE = 'bag of sift colour';
-
 % FEATURE = 'spatial pyramids sift grayscale'
 % FEATURE = 'spatial pyramids sift colour'
 
-CLASSIFIER = 'nearest neighbor';
-% CLASSIFIER = 'support vector machine';
+% CLASSIFIER = 'nearest neighbor';
+CLASSIFIER = 'support vector machine';
+
+LAMBDA = 0.000001;
 
 data_path = '../data/';
 
@@ -54,84 +55,88 @@ fprintf('Getting paths and labels for all train and test data\n')
 
 fprintf('Using %s representation for images\n', FEATURE)
 
-switch lower(FEATURE)    
+switch lower(FEATURE)
+    
     case 'tiny image'     
         train_image_feats = get_tiny_images(train_image_paths);
         test_image_feats  = get_tiny_images(test_image_paths);
+
     case 'colour histogram'
-        %You should allow get_colour_histograms to take parameters e.g.
-        %quantisation, colour space etc.
         train_image_feats = get_colour_histograms(train_image_paths);
         test_image_feats  = get_colour_histograms(test_image_paths);
+
     case 'bag of sift grayscale'
-        % YOU CODE build_vocabulary.m
-        if ~exist('vocab.mat', 'file')
+        % build vocab
+        if exist('vocab.mat', 'file')
+            load('vocab.mat')
+        else
             fprintf('No existing dictionary found. Computing one from training images\n')
-            vocab = build_vocabulary(train_image_paths, vocab_size); %Also allow for different sift parameters
+            vocab = build_vocab_grayscale(train_image_paths, vocab_size, step, size_); %Also allow for different sift parameters
             save('vocab.mat', 'vocab')
         end
-        % YOU CODE get_bags_of_sifts.m
-        % training data
-        if ~exist('training_bag.mat', 'file')
-            fprintf('Computing training features\n');
-            train_image_feats = get_bags_of_sifts_grayscale(train_image_paths);
-            save('training_bag.mat', 'train_image_feats');
+        % bags of sifts
+        if exist('image_feats.mat', 'file')
+            load('image_feats.mat')
         else
-            fprintf('Loading training features\n');
-            load('training_bag.mat');
+            train_image_feats = get_bag_of_sifts_grayscale(train_image_paths, step, size_); %Allow for different sift parameters
+            test_image_feats  = get_bag_of_sifts_grayscale(test_image_paths, step, size_); 
+            save('image_feats.mat', 'train_image_feats', 'test_image_feats')
         end
-        % testing data
-        if ~exist('test_bag.mat', 'file')
-            fprintf('Computing test features\n');
-            test_image_feats  = get_bags_of_sifts_grayscale(test_image_paths);
-            save('test_bag.mat', 'test_image_feats')
-        else
-            fprintf('Loading test features\n');
-            load('test_bag.mat');
-        end
-
+    
     case 'bag of sift colour'
-        % YOU CODE build_vocabulary.m
-        if ~exist('vocab.mat', 'file')
+        % build vocab
+        if exist('vocab.mat', 'file')
+            load('vocab.mat')
+        else
             fprintf('No existing dictionary found. Computing one from training images\n')
             vocab_size = 50; % you need to test the influence of this parameter
-            vocab = build_vocabulary(train_image_paths, vocab_size); %Also allow for different sift parameters
+            vocab = build_vocab_colour(train_image_paths, vocab_size, step, size_); %Also allow for different sift parameters
             save('vocab.mat', 'vocab')
         end 
-        % YOU CODE get_bags_of_sifts.m
-        if ~exist('image_feats.mat', 'file')
-            train_image_feats = get_bag_of_sifts_colour(train_image_paths, step, size); %Allow for different sift parameters
-            test_image_feats  = get_bag_of_sifts_colour(test_image_paths, step, size); 
+        % bags of sifts
+        if exist('image_feats.mat', 'file')
+            load('image_feats.mat')
+        else
+            train_image_feats = get_bag_of_sifts_colour(train_image_paths, step, size_); %Allow for different sift parameters
+            test_image_feats  = get_bag_of_sifts_colour(test_image_paths, step, size_); 
             save('image_feats.mat', 'train_image_feats', 'test_image_feats')
         end
     
     case 'spatial pyramids grayscale'
-        % YOU CODE build_vocabulary.m
-        if ~exist('vocab.mat', 'file')
+        % build vocab
+        if exist('vocab.mat', 'file')
+            load('vocab.mat')
+        else
             fprintf('No existing dictionary found. Computing one from training images\n')
             vocab_size = 50; % you need to test the influence of this parameter
-            vocab = build_vocabulary(train_image_paths, vocab_size); %Also allow for different sift parameters
+            vocab = build_vocabulary(train_image_paths, vocab_size, step, size_); %Also allow for different sift parameters
             save('vocab.mat', 'vocab')
         end 
-        % YOU CODE get_bags_of_sifts.m
-        if ~exist('image_feats.mat', 'file')
-            train_image_feats = get_spatial_pyramid_grayscale(train_image_paths, step, size); %Allow for different sift parameters
-            test_image_feats  = get_spatial_pyramid_grayscale(test_image_paths, step, size); 
+        % bags of sifts
+        if exist('image_feats.mat', 'file')
+            load('image_feats.mat')
+        else
+            train_image_feats = get_spatial_pyramid_grayscale(train_image_paths, step, size_); %Allow for different sift parameters
+            test_image_feats  = get_spatial_pyramid_grayscale(test_image_paths, step, size_); 
             save('image_feats.mat', 'train_image_feats', 'test_image_feats')
         end
 
     case 'spatial pyramids colour'
-       % YOU CODE build_vocabulary.m
-        if ~exist('vocab.mat', 'file')
+       % build vocab
+        if exist('vocab.mat', 'file')
+            load('vocab.mat')
+        else
             fprintf('No existing dictionary found. Computing one from training images\n')
             vocab_size = 50; % you need to test the influence of this parameter
-            vocab = build_vocabulary(train_image_paths, vocab_size); %Also allow for different sift parameters
+            vocab = build_vocabulary(train_image_paths, vocab_size, step, size_); %Also allow for different sift parameters
             save('vocab.mat', 'vocab')
         end 
         % YOU CODE get_bags_of_sifts.m
-        if ~exist('image_feats.mat', 'file')
-            train_image_feats = get_spatial_pyramid_colour(train_image_paths, step, size); %Allow for different sift parameters
-            test_image_feats  = get_spatial_pyramid_colour(test_image_paths, step, size); 
+        if exist('image_feats.mat', 'file')
+            load('vocab.mat')
+        else
+            train_image_feats = get_spatial_pyramid_colour(train_image_paths, step, size_); %Allow for different sift parameters
+            test_image_feats  = get_spatial_pyramid_colour(test_image_paths, step, size_); 
             save('image_feats.mat', 'train_image_feats', 'test_image_feats')
         end
 
@@ -145,13 +150,12 @@ end
 % for more details.
 
 fprintf('Using %s classifier to predict test set categories\n', CLASSIFIER)
-
 switch lower(CLASSIFIER)    
     case 'nearest neighbor'
         predicted_categories = knn_classifier(1, train_image_feats, train_labels, test_image_feats);
     case 'support vector machine'
-        % TODO: svm
-        predicted_categories = svm_classify(train_image_feats, train_labels, test_image_feats);
+        predicted_categories = svm_classify(train_image_feats, train_labels, test_image_feats, LAMBDA);
+%         predicted_categories = svm_classify_modified(train_image_feats, train_labels, test_image_feats, LAMBDA);
 end
 
 %% Step 3: Build a confusion matrix and score the recognition system
