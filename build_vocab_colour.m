@@ -9,27 +9,25 @@ k = vocab_size;
 sift_features = [];
 
 for image_count = 1:total_image
-    image_grayscale = imread(cell2mat(image_paths(image_count)));
-    image = single(image_grayscale);
+    image = imread(cell2mat(image_paths(image_count)));
 
     descriptors = [];
     for channel = 1:3
-        colour_channel = image(:, :, channel);
+        colour_channel = single(image(:, :, channel));
         
         % Extract the SIFT Features (F) and Descriptors (D)
         [~, colour_descriptors] = vl_dsift(colour_channel, 'step', step, 'size', size_, 'Fast');
-        colour_descriptors = colour_descriptors';
         
         % Concatenate descriptors
-        descriptors = [descriptors, colour_descriptors];
+        descriptors = [descriptors, single(colour_descriptors)];
     end
 
     % concatenate descriptors to sift_features matrix
-    sift_features = [sift_features, descriptors'];
+    sift_features = [sift_features, single(descriptors)];
 end
 
-fprintf('clustering the centers \n')
 % Cluster the the descriptors to k clusters
+fprintf('clustering the centers \n')
 [centers, ~] = vl_kmeans(single(sift_features), k);
 fprintf('done clustering the centres \n')
 
