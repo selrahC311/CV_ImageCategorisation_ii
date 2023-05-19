@@ -1,6 +1,6 @@
-function [image_feats, indices] = spatial_pyramid(imagepath, num_regions)
+function [image_feats] = spatial_pyramid(imagepath, num_levels)
 
-load('vocab.mat')
+load('spvocab.mat')
 
 % Find out how many images we are processing
 total_image = size(imagepath, 1);
@@ -8,7 +8,8 @@ total_image = size(imagepath, 1);
 % Get the size of the vocab i.e No of clusters
 vocab_size = size(vocab, 1);
 
-image_feats = zeros(total_image, vocab_size*num_regions);
+% initialise final matrix
+image_feats = zeros(total_image, vocab_size*((4^num_levels)-1)/3);
 
 
 % Loop for every image we are processing
@@ -20,51 +21,37 @@ for image_count = 1:total_image
     % Get the width and height
     [height, width, ~] = size(image_grayscale);
 
-    % check if its a perfect square
-    sqare_root = sqrt(num_regions);
-    if floor(sqare_root) == sqare_root
-        row = sqare_root;
-        col = sqare_root;
-    else
-        % Divide the image into 2 rows and find the number of columns
-        row = 2;
-        col = ceil(num_regions/row);
-    end
+    % Initialise the image feature vector
+    level_feat_vec = [];
 
-    % Get the regions width and height
-    region_height = round(height/row);
-    region_width = round(width/col);
+    for level = 1:num_levels
+        % Get index for row and hight for each cell region
+        row = floor(linspace(1, height, 1+2^(level-1)));    % Geometric series
+        col = floor(linspace(1,width, 1+2^(level-1)));      % Geometric series
 
-    % Initialise the region feature vector
-    region_feats = zeros(1, vocab_size*num_regions);
-    
-    counter = 1;
-    % Number of rows
-    for i = 1:row
-        % Number of columns
-        for j = 1:col
-            % Get the region of the image
-            region = image_grayscale(floor((i-1)*(region_height/row))+1:floor(i*(region_height/row)), floor((j-1)*(region_width/col))+1:floor(j*(region_width/col)), :);
-            % Make the image of type single to work with the function vl_dsift()
-            image = single(region);
-            % Extract the SIFT Features and Descriptors
-            [~, descriptors] = vl_dsift(image, 'Fast');
-            % Convert the descriptors to single data type
-            descriptors = single(descriptors);
-            % Find the nearrest vocab to each descriptor found
-            [indices, ~] = knnsearch(vocab, descriptors', "K", 1);
-            
-            % find how many times the nth visual cluster apeared in an image
-            region_feats(1, (counter-1)*(vocab_size)+1:(counter)*(vocab_size)) = histcounts(indices, vocab_size);
+        
 
-            counter = counter + 1;
+        for i= 2:length(row)
+            for j= 2:length(col)
+                % Get the region of the image
+                region = image_grayscale(row(i-1):row(i), col(j-1):col(j));
+                % Make the image of type single to work with the function vl_dsift()
+                image = single(region);
+                % Extract the SIFT Features and Descriptors
+                [~, descriptors] = vl_dsift(image, 'Fast');
+                % Convert the descriptors to single data type
+                descriptors = single(descriptors);
+                % Find the nearrest vocab to each descriptor found
+                [indices, ~] = knnsearch(single(vocab), descriptors', "K", 1);
+                % find how many times the nth visual cluster apeared in an image
+                level_feat_vec =[level_feat_vec, histcounts(indices, vocab_size)];
+            end
         end
     end
-%     % Normalize the histogram
-%     region_feats(1, :) = region_feats(1, :) / sum(region_feats(1, :));
-
+    % Normalize the histogram
+    level_feat_vec = normalize(level_feat_vec);
     % Add the region feature vector to the image feature matrix
-    image_feats(image_count, :) = region_feats;
+    image_feats(image_count, :) = level_feat_vec;
     fprintf('Progress: %d%%\n', round((image_count/total_image)*100));
 end
 end
