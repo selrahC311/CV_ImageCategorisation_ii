@@ -1,4 +1,4 @@
-function accuracy = accuracy_return(test_labels, categories, predicted_categories)
+function accuracy = accuracy_return(test_labels, categories, abbr_categories , predicted_categories)
 
 num_categories = length(categories);
 
@@ -16,20 +16,11 @@ confusion_matrix = confusion_matrix ./ num_test_per_cat;
 accuracy = mean(diag(confusion_matrix));
 fprintf('Accuracy (mean of diagonal of confusion matrix) is %.3f\n', accuracy)
 
-fig_handle = figure; 
-imagesc(confusion_matrix, [0 1]); 
-set(fig_handle, 'Color', [.988, .988, .988])
-axis_handle = get(fig_handle, 'CurrentAxes');
-set(axis_handle, 'XTick', 1:15)
-set(axis_handle, 'XTickLabel', abbr_categories)
-set(axis_handle, 'YTick', 1:15)
-set(axis_handle, 'YTickLabel', categories)
-% 
-% % Open file for writing output message
-% [success, message, messageid] = mkdir('csv');
-% 
-% fclose('all');
-% fid = fopen('csv/results.csv', 'w+t');
-% fprintf(fid, '%d, %d \n', parameters, accuracy);
-% 
-% fclose(fid);
+% fig_handle = figure; 
+% imagesc(confusion_matrix, [0 1]); 
+% set(fig_handle, 'Color', [.988, .988, .988])
+% axis_handle = get(fig_handle, 'CurrentAxes');
+% set(axis_handle, 'XTick', 1:15)
+% set(axis_handle, 'XTickLabel', abbr_categories)
+% set(axis_handle, 'YTick', 1:15)
+% set(axis_handle, 'YTickLabel', categories)

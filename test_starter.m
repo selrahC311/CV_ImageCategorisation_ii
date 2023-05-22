@@ -2,22 +2,11 @@
 
 data_path = '../data/';
 
-FEATURE = 'bag of sift grayscale';
-% FEATURE = 'bag of sift colour';
-% FEATURE = 'spatial pyramids grayscale';
-% FEATURE = 'spatial pyramids colour';
-
-% CLASSIFIER = 'nearest neighbor';
-CLASSIFIER = 'support vector machine';
-
-step = 3;
-size_ = 3;
-
-sp_level = 4;
-vocab_size_bow_grayscale = 500;
-vocab_size_bow_colour = 500;
-vocab_size_sp_grayscale = 500;
-vocab_size_sp_colour = 500;
+sp_level = 2;
+vocab_size_bow_grayscale = vocab_size;
+vocab_size_bow_colour = vocab_size;
+vocab_size_sp_grayscale = vocab_size;
+vocab_size_sp_colour = vocab_size;
 
 vocab_path_bow_grayscale = "vocab_grayscale/vocab_" + vocab_size_bow_grayscale + ".mat";
 vocab_path_bow_colour = "vocab_colour/vocab_" + vocab_size_bow_colour + ".mat";
@@ -25,15 +14,15 @@ vocab_path_sp_grayscale = "vocab_grayscale/vocab_" + vocab_size_sp_grayscale + "
 vocab_path_sp_colour = "vocab_colour/vocab_" + vocab_size_sp_colour + ".mat";
 
 img_feats_path_bow_grayscale = "image_feats/bow_grayscale/" + "step" ...
-    + step + "/size" + size_ + "img_feat_vocab_" + vocab_size + ".mat";
+    + step + "/size" + size_ + "/img_feat_vocab_" + vocab_size_bow_grayscale + ".mat";
 img_feats_path_bow_colour = "image_feats/bow_colour/" + "step" + step ...
-    + "/size" + size_ + "img_feat_vocab_" + vocab_size + ".mat";
+    + "/size" + size_ + "/img_feat_vocab_" + vocab_size_bow_colour + ".mat";
 img_feats_path_sp_grayscale = "image_feats/sp_grayscale/" + "step" + step ...
-    + "/size" + size_ + "img_feat_vocab_" + vocab_size + ".mat";
+    + "/size" + size_ + "/img_feat_vocab_" + vocab_size_sp_grayscale + ".mat";
 img_feats_path_sp_colour = "image_feats/sp_colour/" + "step" + step + ...
-    "/size" + size_ + "img_feat_vocab_" + vocab_size + ".mat";
+    "/size" + size_ + "/img_feat_vocab_" + vocab_size_sp_colour + ".mat";
 
-LAMBDA = 0.000001;
+LAMBDA = 0.0001;
 
 %% getting categories and path
 
@@ -73,12 +62,13 @@ switch lower(FEATURE)
             vocab = build_vocab_grayscale(train_image_paths, vocab_size, step, size_); %Also allow for different sift parameters
         end
         % img feats
-        if ~exist(img_feats_path_bow_grayscale, 'file')
+        if exist(img_feats_path_bow_grayscale, 'file')
             load(img_feats_path_bow_grayscale)
         else
             fprintf('No existing image features found. Computing one from images\n')
             train_image_feats = get_bag_of_sifts_grayscale(train_image_paths, step, size_, vocab); %Allow for different sift parameters
             test_image_feats  = get_bag_of_sifts_grayscale(test_image_paths, step, size_, vocab);
+            save(img_feats_path_bow_grayscale, "train_image_feats", "test_image_feats")
         end
     
     case 'bag of sift colour'
@@ -97,7 +87,7 @@ switch lower(FEATURE)
             fprintf('No existing image features found. Computing one from images\n')
             train_image_feats = get_bag_of_sifts_colour(train_image_paths, step, size_, vocab); %Allow for different sift parameters
             test_image_feats  = get_bag_of_sifts_colour(test_image_paths, step, size_, vocab); 
-%             save('image_feats.mat', 'train_image_feats', 'test_image_feats')
+            save(img_feats_path_bow_colour, 'train_image_feats', 'test_image_feats')
         end
     
     case 'spatial pyramids grayscale'
@@ -116,7 +106,7 @@ switch lower(FEATURE)
             fprintf('No existing image features found. Computing one from images\n')
             train_image_feats = spatial_pyramid_newest(train_image_paths, sp_level, step, size_, vocab); %Allow for different sift parameters
             test_image_feats  = spatial_pyramid_newest(test_image_paths, sp_level, step, size_, vocab); 
-%             save('image_feats.mat', 'train_image_feats', 'test_image_feats')
+            save(img_feats_path_sp_grayscale, 'train_image_feats', 'test_image_feats')
         end
 
     case 'spatial pyramids colour'
@@ -135,7 +125,7 @@ switch lower(FEATURE)
             fprintf('No existing image features found. Computing one from images\n')
             train_image_feats = get_spatial_pyramid_sifts_colour(train_image_paths, sp_level, step, size_, vocab); %Allow for different sift parameters
             test_image_feats  = get_spatial_pyramid_sifts_colour(test_image_paths, sp_level, step, size_, vocab); 
-            save('image_feats.mat', 'train_image_feats', 'test_image_feats')
+            save(img_feats_path_sp_colour, 'train_image_feats', 'test_image_feats')
         end
 
 end
@@ -144,12 +134,11 @@ end
 fprintf('Using %s classifier to predict test set categories\n', CLASSIFIER)
 switch lower(CLASSIFIER)    
     case 'nearest neighbor'
-        predicted_categories = knn_classifier(1, train_image_feats, train_labels, test_image_feats);
+        predicted_categories = nearest_neighbor_classify(1, train_image_feats, train_labels, test_image_feats);
     case 'support vector machine'
         predicted_categories = svm_classify(train_image_feats, train_labels, test_image_feats, LAMBDA);
-
 end
 
 %% Step 3: output to csv
-accuracy = accuracy_return(test_labels, categories, predicted_categories);
+accuracy = accuracy_return(test_labels, categories, abbr_categories, predicted_categories);
 
