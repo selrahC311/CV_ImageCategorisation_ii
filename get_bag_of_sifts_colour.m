@@ -1,6 +1,5 @@
-function [image_feats] = get_bag_of_sifts_colour(image_paths, step, size_, vocab_path)
+function [image_feats] = get_bag_of_sifts_colour(image_paths, step, size_, vocab)
 tic
-load(vocab_path);
 
 % num of clusters
 vocab_size = size(vocab, 1);

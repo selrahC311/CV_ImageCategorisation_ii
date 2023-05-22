@@ -1,6 +1,5 @@
-function [image_feats] = get_spatial_pyramid_sifts_colour(image_paths, sp_levels, step, size_, vocab_path)
+function [image_feats] = get_spatial_pyramid_sifts_colour(image_paths, sp_levels, step, size_, vocab)
 tic
-load(vocab_path)
 
 total_image = size(image_paths, 1);
 vocab_size = size(vocab, 1);

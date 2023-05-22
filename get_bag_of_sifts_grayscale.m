@@ -1,7 +1,5 @@
-function image_feats = get_bag_of_sifts_grayscale(image_paths, step, size_, vocab_path)
+function image_feats = get_bag_of_sifts_grayscale(image_paths, step, size_, vocab)
 tic
-load(vocab_path);
-
 % num of clusters
 vocab_size = size(vocab, 1);
 total_image = size(image_paths, 1);

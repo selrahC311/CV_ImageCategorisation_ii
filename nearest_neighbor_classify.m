@@ -20,4 +20,4 @@ for i = 1:size(train_image_feat, 1)
         predicted_categories{i} = char(nearest_label(1));
     end
 end
-end
+
