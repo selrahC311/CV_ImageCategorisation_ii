@@ -4,16 +4,16 @@ data_path = '../data/';
 
 % FEATURE = 'bag of sift grayscale';
 % FEATURE = 'bag of sift colour';
-% FEATURE = 'spatial pyramids grayscale';
-FEATURE = 'spatial pyramids colour';
+FEATURE = 'spatial pyramids grayscale';
+% FEATURE = 'spatial pyramids colour';
 
-% CLASSIFIER = 'nearest neighbor';
-CLASSIFIER = 'support vector machine';
+CLASSIFIER = 'nearest neighbor';
+% CLASSIFIER = 'support vector machine';
 
 step = 2;
 size_ = 2;
 
-sp_level = 4;
+sp_level = 3;
 vocab_size_bow_grayscale = 500;
 vocab_size_bow_colour = 500;
 vocab_size_sp_grayscale = 500;
@@ -171,7 +171,7 @@ end
 fprintf('Using %s classifier to predict test set categories\n', CLASSIFIER)
 switch lower(CLASSIFIER)    
     case 'nearest neighbor'
-        predicted_categories = knn_classifier(1, train_image_feats, train_labels, test_image_feats);
+        predicted_categories = nearest_neighbor_classify(3, train_image_feats, train_labels, test_image_feats);
     case 'support vector machine'
         predicted_categories = svm_classify(train_image_feats, train_labels, test_image_feats, LAMBDA);
 
