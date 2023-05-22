@@ -1,5 +1,5 @@
 %% Step 0: Set up parameters, vlfeat, category list, and image paths.
-
+tic
 data_path = '../data/';
 
 % FEATURE = 'bag of sift grayscale';
@@ -10,19 +10,29 @@ FEATURE = 'spatial pyramids colour';
 % CLASSIFIER = 'nearest neighbor';
 CLASSIFIER = 'support vector machine';
 
-step = 3;
-size_ = 3;
+step = 2;
+size_ = 2;
 
 sp_level = 4;
 vocab_size_bow_grayscale = 500;
 vocab_size_bow_colour = 500;
 vocab_size_sp_grayscale = 500;
 vocab_size_sp_colour = 500;
+vocab_size = 500;
 
 vocab_path_bow_grayscale = "vocab_grayscale/vocab_" + vocab_size_bow_grayscale + ".mat";
 vocab_path_bow_colour = "vocab_colour/vocab_" + vocab_size_bow_colour + ".mat";
 vocab_path_sp_grayscale = "vocab_grayscale/vocab_" + vocab_size_sp_grayscale + ".mat";
 vocab_path_sp_colour = "vocab_colour/vocab_" + vocab_size_sp_colour + ".mat";
+
+img_feats_path_bow_grayscale = "image_feats/bow_grayscale/" + "step" ...
+    + step + "/size" + size_ + "/img_feat_vocab_" + vocab_size + ".mat";
+img_feats_path_bow_colour = "image_feats/bow_colour/" + "step" + step ...
+    + "/size" + size_ + "/img_feat_vocab_" + vocab_size + ".mat";
+img_feats_path_sp_grayscale = "image_feats/sp_grayscale/" + "step" + step ...
+    + "/size" + size_ + "/img_feat_vocab_" + vocab_size + ".mat";
+img_feats_path_sp_colour = "image_feats/sp_colour/" + "step" + step + ...
+    "/size" + size_ + "/img_feat_vocab_" + vocab_size + ".mat";
 
 LAMBDA = 0.000001;
 
@@ -139,6 +149,7 @@ switch lower(FEATURE)
             save(vocab_path_sp_colour, 'vocab')
         end 
         % sp feats
+        fprintf(img_feats_path_sp_colour);
         if exist(img_feats_path_sp_colour, 'file')
             load(img_feats_path_sp_colour)
         else
@@ -180,3 +191,4 @@ create_results_webpage( train_image_paths, ...
                         categories, ...
                         abbr_categories, ...
                         predicted_categories)
+toc
