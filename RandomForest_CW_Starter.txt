@@ -1,0 +1,6 @@
+train_image_feats = 5;  % Training image features
+train_labels = 4;  % Training labels
+test_image_feats = 4;  % Test image features
+num_trees = 100;  % Number of trees in the random forest
+
+predicted_categories = random_forest_classify(train_image_feats, train_labels, test_image_feats, num_trees);
