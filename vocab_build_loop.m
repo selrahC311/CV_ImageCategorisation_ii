@@ -40,7 +40,7 @@ fprintf('Getting paths and labels for all train and test data\n')
 
 %% start loop, uncomment grayscale or colour before run
 % from 100 to 1000 vocab
-for vocab_size = 100:100:1000
+sna000qfor vocab_size = 100:100:1000
     fprintf('voabl size = %d \n', vocab_size)
 
     filename = "vocab_" + vocab_size + ".mat";

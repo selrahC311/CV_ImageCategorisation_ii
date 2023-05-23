@@ -104,8 +104,8 @@ switch lower(FEATURE)
             load(img_feats_path_sp_grayscale)
         else
             fprintf('No existing image features found. Computing one from images\n')
-            train_image_feats = spatial_pyramid_newest(train_image_paths, sp_level, step, size_, vocab); %Allow for different sift parameters
-            test_image_feats  = spatial_pyramid_newest(test_image_paths, sp_level, step, size_, vocab); 
+            train_image_feats = get_spatial_pyramid_sifts_grayscale(train_image_paths, sp_level, step, size_, vocab); %Allow for different sift parameters
+            test_image_feats  = get_spatial_pyramid_sifts_grayscale(test_image_paths, sp_level, step, size_, vocab); 
             save(img_feats_path_sp_grayscale, 'train_image_feats', 'test_image_feats')
         end
 
