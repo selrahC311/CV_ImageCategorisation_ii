@@ -1,4 +1,5 @@
 function predicted_categories = svm_classify(train_image_feats, train_labels, test_image_feats, lambda)
+rng(756862700)
 % category list
 categories = unique(train_labels); 
 num_categories = length(categories);
@@ -12,7 +13,7 @@ for cat_num = 1:num_categories
     matched_indices(matched_indices == 0) = -1;
     
     % svm for category
-    [w, b] = vl_svmtrain(train_image_feats', matched_indices, lambda); 
+    [w, b] = vl_svmtrain(train_image_feats', matched_indices, lambda, 'MaxNumIterations', 10000000); 
     scores(cat_num,:) =  w' * test_image_feats' + b;
 end
 % max scores
