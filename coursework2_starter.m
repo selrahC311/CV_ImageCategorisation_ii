@@ -2,24 +2,25 @@
 tic
 data_path = '../data/';
 
-FEATURE = 'bag of sift grayscale';
+% FEATURE = 'bag of sift grayscale';
 % FEATURE = 'bag of sift colour';
 % FEATURE = 'spatial pyramids grayscale';
-% FEATURE = 'spatial pyramids colour';
+FEATURE = 'spatial pyramids colour';
 
 % CLASSIFIER = 'nearest neighbor';
-CLASSIFIER = 'support vector machine';
+% CLASSIFIER = 'support vector machine';
+CLASSIFIER = 'nn';
 
 step = 2;
-size_ = 4;
+size_ = 2;
 
-sp_level = 1;
-LAMBDA = 0.0001;
+sp_level = 2;
+LAMBDA = 0.000001;
 
 vocab_size_bow_grayscale = 400;
-vocab_size_bow_colour = 700;
+vocab_size_bow_colour = 300;
 vocab_size_sp_grayscale = 300;
-vocab_size_sp_colour = 400;
+vocab_size_sp_colour = 700;
 
 %% getting categories and path
 
@@ -164,6 +165,8 @@ switch lower(CLASSIFIER)
         predicted_categories = nearest_neighbor_classify(3, train_image_feats, train_labels, test_image_feats);
     case 'support vector machine'
         predicted_categories = svm_classify(train_image_feats, train_labels, test_image_feats, LAMBDA);
+    case 'nn'
+        predicted_categories = nn(train_image_paths, train_labels, test_image_paths, 64, 0.8, 64, 0.001);
 
 end
 

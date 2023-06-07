@@ -135,7 +135,7 @@ numFilters=75;
 layers = [
     % image input layer whose input size is 32-32-1. "3" represents one
     % color channel (RGB image)
-    imageInputLayer([32 32 3]) 
+    imageInputLayer([width width 3]) 
     % convolutional layer whose filter size is 3 by 3 
     convolution2dLayer(3,numFilters,'Padding','same')
     % batch normalization layer
