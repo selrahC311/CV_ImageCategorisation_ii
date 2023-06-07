@@ -24,7 +24,7 @@ for image_count = 1:total_image
                 
                 % each colour channel
                 descriptors = [];
-                for channel = 1:3
+                parfor channel = 1:3
                     % SIFT features and descriptors
                     colour_channel = region(:, :, channel);
                     [~, colour_descriptors] = vl_dsift(single(colour_channel), 'step', step, 'size', size_, 'Fast');
